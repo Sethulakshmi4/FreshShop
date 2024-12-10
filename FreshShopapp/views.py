@@ -59,14 +59,17 @@ def logout_view(request):
 @never_cache
 @login_required
 def view_products(request):
-    products = Product.objects.all()
-    # query = request.GET.get('q',' ')
-    # # Fetch all products from the database
-    
-    # if query:
-    #     products = products.filter(
-    #         Q(name_icontains=query) | Q(description_icontains=query)
-    #     )
+    # Get the search query from the request
+    query = request.GET.get('search', '')
+
+    if query:
+        # Filter products by name or description containing the search term (case-insensitive)
+        products = Product.objects.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        )
+    else:
+        # If no search query, display all products
+        products = Product.objects.all()
     
     # Set up pagination
     paginator = Paginator(products, 3)  # 3 products per page
